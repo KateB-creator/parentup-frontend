@@ -1,0 +1,19 @@
+# Node.js
+node_modules/
+dist/
+.vite/
+
+# PHP
+/vendor/
+*.log
+
+# Ambiente
+.env
+.env.local
+.env.production
+backend/.env
+backend/vendor/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
