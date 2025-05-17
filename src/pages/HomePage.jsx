@@ -9,6 +9,8 @@ import LGBTQSection from "../components/LGBTQSection";
 import BoardSection from "../components/BoardSection";
 import BabyCareSection from "../components/BabyCareSection";
 
+
+
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -229,9 +231,9 @@ export default function HomePage() {
 
           {/* Riga con link privacy e contatti */}
           <p className="text-center small mb-0">
-            <a href="/privacy" className="text-white text-decoration-underline">
+          <Link to="/privacy" className="text-white text-decoration-underline">
               Privacy
-            </a>{" "}
+            </Link>{" "}
             ·
             <a
               href="https://kateb-creator.github.io/il-mio-sito-web/#contact"
