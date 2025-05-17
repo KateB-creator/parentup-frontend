@@ -96,6 +96,7 @@ export default function BoardSection() {
   return (
     <div className="mt-4">
       <h4>Condividi la tua esperienza sul rientro al lavoro</h4>
+      <p className="text-muted">Per lasciare un commento è necessario registrarsi o accedere al proprio account.</p>
 
       <div className="mb-4 p-3 border rounded bg-light">
         <input

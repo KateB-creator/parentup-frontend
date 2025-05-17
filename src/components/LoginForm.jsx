@@ -63,9 +63,6 @@ export default function LoginForm() {
               <input type="password" className="form-control rounded-pill" value={password}
                 onChange={(e) => setPassword(e.target.value)} required />
             </div>
-            <div className="mb-3 text-end">
-              <a href="#">Ho dimenticato la password</a>
-            </div>
             <button type="submit" className="btn btn-primary w-100 rounded-pill">Accedi</button>
           </form>
         </div>
