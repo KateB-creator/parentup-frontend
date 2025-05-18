@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Navbar.css';
+import Collapse from 'bootstrap/js/dist/collapse';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function Navbar() {
   const closeNavbar = () => {
     const navbar = document.getElementById('navbarNav');
     if (navbar && navbar.classList.contains('show')) {
-      new bootstrap.Collapse(navbar).hide();
+      new Collapse(navbar).hide();
     }
   };
 
@@ -42,7 +43,7 @@ export default function Navbar() {
       navigate(`/#${id}`);
     }
   };
-  
+
   return (
     <nav className={`navbar navbar-expand-lg fixed-top px-3 shadow-sm ${scrolled ? 'navbar-solid' : 'navbar-transparent'}`}>
       <div className="container">
