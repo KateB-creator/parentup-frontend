@@ -42,6 +42,7 @@ export default function Navbar() {
       navigate(`/#${id}`);
     }
   };
+  
   return (
     <nav className={`navbar navbar-expand-lg fixed-top px-3 shadow-sm ${scrolled ? 'navbar-solid' : 'navbar-transparent'}`}>
       <div className="container">
