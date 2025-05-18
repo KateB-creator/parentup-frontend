@@ -28,7 +28,8 @@ export default function Navbar() {
   const closeNavbar = () => {
     const navbar = document.getElementById('navbarNav');
     if (navbar && navbar.classList.contains('show')) {
-      new Collapse(navbar).hide();
+      const bsCollapse = Collapse.getInstance(navbar) || new Collapse(navbar);
+      bsCollapse.hide();
     }
   };
 
@@ -88,7 +89,7 @@ export default function Navbar() {
             {isLoggedIn ? (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/dashboard">Dashboard</Link>
+                <Link className="nav-link" to="/dashboard" onClick={closeNavbar}>Dashboard</Link>
                 </li>
                 <li className="nav-item">
                   <button className="btn btn-outline-danger ms-2" onClick={handleLogout}>Logout</button>
@@ -96,8 +97,8 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <li className="nav-item"><Link className="nav-link" to="/login">Login</Link></li>
-                <li className="nav-item"><Link className="nav-link" to="/register">Registrati</Link></li>
+                <li className="nav-item"><Link className="nav-link" to="/login onClick={closeNavbar}">Login</Link></li>
+                <li className="nav-item"><Link className="nav-link" to="/register onClick={closeNavbar}">Registrati</Link></li>
               </>
             )}
           </ul>
