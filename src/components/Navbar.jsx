@@ -24,7 +24,15 @@ export default function Navbar() {
     navigate('/login');
   };
 
+  const closeNavbar = () => {
+    const navbar = document.getElementById('navbarNav');
+    if (navbar && navbar.classList.contains('show')) {
+      new bootstrap.Collapse(navbar).hide();
+    }
+  };
+
   const handleScrollOrNavigate = (id) => {
+    closeNavbar(); // chiude il menu mobile
     if (location.pathname === '/') {
       const element = document.getElementById(id);
       if (element) {
@@ -34,7 +42,6 @@ export default function Navbar() {
       navigate(`/#${id}`);
     }
   };
-
   return (
     <nav className={`navbar navbar-expand-lg fixed-top px-3 shadow-sm ${scrolled ? 'navbar-solid' : 'navbar-transparent'}`}>
       <div className="container">
