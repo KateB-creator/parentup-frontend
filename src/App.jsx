@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
 import PrivacyPage from "./pages/PrivacyPage";
+import './styles/global.css';
 
 
 function App() {

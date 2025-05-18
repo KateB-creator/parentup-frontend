@@ -69,7 +69,7 @@ const BenessereSection = () => {
           style={{ scrollBehavior: 'smooth' }}
         >
           {cards.map((card, idx) => (
-            <div key={idx} className="card shadow-sm" style={{ minWidth: '250px', flex: '0 0 auto' }}>
+            <div key={idx} className="card shadow-sm card-size" style={{ minWidth: '250px', flex: '0 0 auto' }}>
               <img src={card.image} className="card-img-top" alt={card.title} />
               <div className="card-body text-center">
                 <h5 className="card-title">{card.title}</h5>

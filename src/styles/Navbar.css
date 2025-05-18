@@ -1,4 +1,6 @@
-/* --- Navbar dinamica --- */
+.navbar{
+  width: 100%;
+}
 
 /* Navbar trasparente sopra hero */
 .navbar-transparent {
@@ -23,16 +25,19 @@
   color: white !important;
 }
 
+.navbar .nav-link {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.2s;
+}
+
 
 .navbar .navbar-brand {
   font-weight: bold;
   font-size: 1.4rem;
 }
 
-.navbar .nav-link { 
-  margin-right: 0.75rem;
-  transition: color 0.2s;
-}
 
 .navbar .nav-link:hover {
   color: #f4b20b !important;

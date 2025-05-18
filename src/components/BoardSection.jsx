@@ -22,7 +22,11 @@ export default function BoardSection() {
 
   const fetchPosts = () => {
     getPosts()
-      .then(res => setPosts(res.data))
+      .then(res => {
+        // se la risposta ha un wrapper "data", accedi all'array dentro
+        const data = Array.isArray(res.data) ? res.data : res.data.data;
+        setPosts(data);
+      })
       .catch(err => console.error(err));
   };
 

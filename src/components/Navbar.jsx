@@ -27,7 +27,9 @@ export default function Navbar() {
   const handleScrollOrNavigate = (id) => {
     if (location.pathname === '/') {
       const element = document.getElementById(id);
-      if (element) element.scrollIntoView({ behavior: 'smooth' });
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     } else {
       navigate(`/#${id}`);
     }
@@ -35,7 +37,7 @@ export default function Navbar() {
 
   return (
     <nav className={`navbar navbar-expand-lg fixed-top px-3 shadow-sm ${scrolled ? 'navbar-solid' : 'navbar-transparent'}`}>
-      <div className="container-fluid">
+      <div className="container">
         <Link className="navbar-brand fw-bold" to="/">ParentUp</Link>
         <button
           className="navbar-toggler"

@@ -1,4 +1,4 @@
-// src/pages/PrivacyPage.jsx
+
 import React from "react";
 
 const PrivacyPage = () => {

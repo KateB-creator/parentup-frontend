@@ -2,7 +2,7 @@ import axios from "axios";
 
 axios.defaults.withCredentials = true;
 
-const API_BASE = "https://parentup.smokatails.it/index.php/api";
+const API_BASE = "http://localhost/parentup-backend/index.php/api";
 
 // --- USER AUTH ---
 export const login = (email, password) =>
@@ -30,6 +30,12 @@ export const updateUser = (id, { email, password }) =>
 
 export const deleteUser = (id) =>
   axios.delete(`${API_BASE}/users/${id}`);
+
+export const recoverPassword = (email) =>
+  axios.post(`${API_BASE}/recover-password`, { email });
+
+export const resetPassword = (email, newPassword) =>
+  axios.post(`${API_BASE}/reset-password`, { email, newPassword });
 
 // --- POSTS ---
 export const createPost = (title, content) =>
