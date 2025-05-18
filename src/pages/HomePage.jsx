@@ -9,8 +9,6 @@ import LGBTQSection from "../components/LGBTQSection";
 import BoardSection from "../components/BoardSection";
 import BabyCareSection from "../components/BabyCareSection";
 import { Link } from "react-router-dom";
-import ScrollToAnchor from '../components/ScrollToAnchor';
-
 
 
 
@@ -32,15 +30,7 @@ export default function HomePage() {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    const anchor = window.location.hash?.substring(1);
-    if (anchor) {
-      setTimeout(() => {
-        const el = document.getElementById(anchor);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 300);
-    }
-  }, []);
+
 
   if (isLoading) {
     return (
@@ -53,12 +43,12 @@ export default function HomePage() {
     );
   }
 
+
  
 
   return (
     <div className="home-wrapper">
       <Navbar />
-      <ScrollToAnchor />
       {/* Hero iniziale */}
       <div className="hero-section d-flex justify-content-center align-items-center text-center">
         <div className="container">

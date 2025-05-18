@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Navbar.css';
-import Collapse from 'bootstrap/js/dist/collapse';
+
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -11,44 +11,57 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Cambia lo stato se scroll > 100px
-      setScrolled(window.scrollY > 100);
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 100);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('userEmail');
-    navigate('/login');
-  };
-
   const closeNavbar = () => {
     const navbar = document.getElementById('navbarNav');
     if (navbar && navbar.classList.contains('show')) {
-      const bsCollapse = Collapse.getInstance(navbar) || new Collapse(navbar);
-      bsCollapse.hide();
+      const existingInstance = Collapse.getInstance(navbar);
+      if (existingInstance) {
+        existingInstance.hide();
+      } else {
+        const bsCollapse = new Collapse(navbar, { toggle: false });
+        bsCollapse.hide();
+      }
     }
   };
 
   const handleScrollOrNavigate = (id) => {
-    closeNavbar(); // chiude il menu mobile
-    if (location.pathname === '/') {
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
       }
-    } else {
+      closeNavbar();
+    }, 100);
+
+    if (location.pathname !== '/') {
       navigate(`/#${id}`);
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const navbar = document.getElementById('navbarNav');
+      const toggler = document.querySelector('.navbar-toggler');
+      if (navbar?.classList.contains('show') && !navbar.contains(event.target) && !toggler.contains(event.target)) {
+        closeNavbar();
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   return (
     <nav className={`navbar navbar-expand-lg fixed-top px-3 shadow-sm ${scrolled ? 'navbar-solid' : 'navbar-transparent'}`}>
       <div className="container">
-        <Link className="navbar-brand fw-bold" to="/">ParentUp</Link>
+        <Link className="navbar-brand fw-bold" to="/" onClick={closeNavbar}>
+          ParentUp
+        </Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -57,8 +70,8 @@ export default function Navbar() {
           aria-controls="navbarNav"
           aria-expanded="false"
           aria-label="Toggle navigation"
-          style={{ borderColor: '#fff' }}>
-          <span className="navbar-toggler-icon" style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e\")" }}></span>
+        >
+          <span className="navbar-toggler-icon"></span>
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
@@ -89,16 +102,32 @@ export default function Navbar() {
             {isLoggedIn ? (
               <>
                 <li className="nav-item">
-                <Link className="nav-link" to="/dashboard" onClick={closeNavbar}>Dashboard</Link>
+                  <Link className="nav-link" to="/dashboard" onClick={closeNavbar}>
+                    Dashboard
+                  </Link>
                 </li>
                 <li className="nav-item">
-                  <button className="btn btn-outline-danger ms-2" onClick={handleLogout}>Logout</button>
+                  <button className="btn btn-outline-danger ms-2" onClick={() => {
+                    localStorage.clear();
+                    navigate('/login');
+                    closeNavbar();
+                  }}>
+                    Logout
+                  </button>
                 </li>
               </>
             ) : (
               <>
-                <li className="nav-item"><Link className="nav-link" to="/login onClick={closeNavbar}">Login</Link></li>
-                <li className="nav-item"><Link className="nav-link" to="/register onClick={closeNavbar}">Registrati</Link></li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login" onClick={closeNavbar}>
+                    Login
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/register" onClick={closeNavbar}>
+                    Registrati
+                  </Link>
+                </li>
               </>
             )}
           </ul>
