@@ -3,7 +3,7 @@ import axios from "axios";
 // Abilita i cookie di sessione per tutte le richieste
 axios.defaults.withCredentials = true;
 
-const API_BASE = "http://parentup.smokatails.it/index.php/api";
+const API_BASE = "https://parentup.smokatails.it/index.php/api";
 
 // --- USER AUTH ---
 export const login = (email, password) =>
