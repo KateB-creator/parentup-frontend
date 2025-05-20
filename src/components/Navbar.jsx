@@ -8,7 +8,7 @@ export default function Navbar() {
   const isLoggedIn = !!localStorage.getItem('userEmail');
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  console.log('menuOpen:', menuOpen);
+
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 100);
