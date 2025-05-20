@@ -34,10 +34,18 @@ export default function BoardSection() {
     fetchPosts();
   
     const storedId = localStorage.getItem('userId');
-    if (storedId) {
-      setLoggedUserId(parseInt(storedId));
+    console.log("🔍 userId in localStorage:", storedId); // DEBUG
+  
+    if (storedId && storedId !== 'undefined') {
+      const parsedId = Number(storedId);
+      if (!isNaN(parsedId)) {
+        setLoggedUserId(parsedId);
+        console.log("✅ loggedUserId impostato:", parsedId);
+      } else {
+        console.warn("⚠ userId non numerico:", storedId);
+      }
     } else {
-      console.warn("Nessun userId trovato in localStorage");
+      console.info("ℹ Utente non loggato, userId assente.");
     }
   }, []);
   
@@ -133,25 +141,25 @@ export default function BoardSection() {
                   <p>{post.content}</p>
                   <small className="text-muted">{post.created_at}</small>
                 </div>
-                {parseInt(post.user_id) === loggedUserId && (
-                <div style={{ backgroundColor: 'lightyellow', border: '1px solid red' }}>
-                  <button
-                    className="btn btn-sm btn-warning me-2"
-                    onClick={() => {
-                      setEditPostId(post.id);
-                      setEditPostData({ title: post.title, content: post.content });
-                    }}
-                  >
-                    ✏ MOD
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={() => handleDeletePost(post.id)}
-                  >
-                    🗑 DEL
-                  </button>
-                </div>
-              )}
+                {loggedUserId && (
+  <div style={{ backgroundColor: 'lightyellow', border: '1px solid red' }}>
+    <button
+      className="btn btn-sm btn-warning me-2"
+      onClick={() => {
+        setEditPostId(post.id);
+        setEditPostData({ title: post.title, content: post.content });
+      }}
+    >
+      ✏ MOD
+    </button>
+    <button
+      className="btn btn-sm btn-outline-danger"
+      onClick={() => handleDeletePost(post.id)}
+    >
+      🗑 DEL
+    </button>
+  </div>
+)}
               </div>
               {editPostId === post.id && (
                 <div className="mt-2">

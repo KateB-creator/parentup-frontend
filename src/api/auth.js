@@ -2,7 +2,6 @@ import axios from "axios";
 
 const API_BASE = "https://parentup.smokatails.it/index.php/api";
 
-// ✅ Imposta il token JWT se presente
 const token = localStorage.getItem("token");
 if (token) {
   axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -11,9 +10,19 @@ if (token) {
 // --- USER AUTH ---
 export const login = async (email, password) => {
   const res = await axios.post(`${API_BASE}/login`, { email, password });
-  const { token } = res.data;
+
+  console.log("🔁 Risposta dal login:", res.data); // 👈 stampiamo tutto
+
+  const { token, user } = res.data;
+
+  console.log("📦 token:", token);
+  console.log("👤 user:", user);
+
   localStorage.setItem("token", token);
+  localStorage.setItem("userId", user?.id); // salva solo se esiste
+
   axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
   return res;
 };
 
@@ -29,8 +38,9 @@ export const register = (email, password, nome, cognome, genere, dataNascita) =>
 
 export const logout = () => {
   localStorage.removeItem("token");
+  localStorage.removeItem("userId");
   delete axios.defaults.headers.common["Authorization"];
-  return Promise.resolve(); // logout è gestito solo lato client
+  return Promise.resolve();
 };
 
 // --- USER INFO ---
@@ -50,8 +60,8 @@ export const resetPassword = (email, newPassword) =>
   axios.post(`${API_BASE}/reset-password`, { email, newPassword });
 
 // --- POSTS ---
-export const createPost = (title, content) =>
-  axios.post(`${API_BASE}/posts`, { title, content });
+export const createPost = (title, content, user_id) =>
+  axios.post(`${API_BASE}/posts`, { title, content, user_id });
 
 export const getPosts = () =>
   axios.get(`${API_BASE}/posts`);
@@ -59,24 +69,24 @@ export const getPosts = () =>
 export const getPost = (id) =>
   axios.get(`${API_BASE}/posts/${id}`);
 
-export const updatePost = (id, title, content) =>
-  axios.put(`${API_BASE}/posts/${id}`, { title, content });
+export const updatePost = (id, title, content, user_id) =>
+  axios.put(`${API_BASE}/posts/${id}`, { title, content, user_id });
 
-export const deletePost = (id) =>
-  axios.delete(`${API_BASE}/posts/${id}`);
+export const deletePost = (id, user_id) =>
+  axios.delete(`${API_BASE}/posts/${id}`, { data: { user_id } });
 
 // --- COMMENTS ---
-export const createComment = (post_id, content) =>
-  axios.post(`${API_BASE}/comments`, { post_id, content });
+export const createComment = (post_id, content, user_id) =>
+  axios.post(`${API_BASE}/comments`, { post_id, content, user_id });
 
 export const getComments = (post_id) =>
   axios.get(`${API_BASE}/comments?post_id=${post_id}`);
 
-export const updateComment = (id, content) =>
-  axios.put(`${API_BASE}/comments/${id}`, { content });
+export const updateComment = (id, content, user_id) =>
+  axios.put(`${API_BASE}/comments/${id}`, { content, user_id });
 
-export const deleteComment = (id) =>
-  axios.delete(`${API_BASE}/comments/${id}`);
+export const deleteComment = (id, user_id) =>
+  axios.delete(`${API_BASE}/comments/${id}`, { data: { user_id } });
 
 // --- NOTIFICATIONS ---
 export const getNotifications = () =>
