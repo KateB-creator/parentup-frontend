@@ -6,6 +6,7 @@ import "../styles/Dashboard.css";
 export default function Dashboard() {
   const navigate = useNavigate();
   const [email, setEmail] = useState(localStorage.getItem("userEmail") || "");
+  const [userId] = useState(localStorage.getItem("userId"));
   const [nome] = useState(localStorage.getItem("userNome") || "");
   const [cognome] = useState(localStorage.getItem("userCognome") || "");
   const [messaggio, setMessaggio] = useState("");
@@ -91,7 +92,7 @@ export default function Dashboard() {
         payload.password = newPassword;
       }
 
-      const res = await updateUser(id, payload); 
+      const res = await updateUser(userId, payload); 
       if (res.data.success) {
         localStorage.setItem("userEmail", email);
         setMessaggio("Dati aggiornati con successo.");
@@ -112,7 +113,7 @@ export default function Dashboard() {
       )
     ) {
       try {
-        const res = await deleteUser();
+        const res = await deleteUser(userId);
         if (res.data.success) {
           localStorage.clear();
           navigate("/register");
