@@ -51,14 +51,22 @@ export default function Dashboard() {
   }, [ritornoLavoro]);
 
   useEffect(() => {
-    getNotifications()
-      .then((res) => {
-        if (res.data && Array.isArray(res.data)) {
-          setNotifiche(res.data);
-        }
-      })
-      .catch((err) => console.error("Errore notifiche:", err));
+    const fetchNotifiche = () => {
+      getNotifications()
+        .then((res) => {
+          if (res.data && Array.isArray(res.data)) {
+            setNotifiche(res.data);
+          }
+        })
+        .catch((err) => console.error("Errore notifiche:", err));
+    };
+
+    fetchNotifiche();
+    const intervalId = setInterval(fetchNotifiche, 30000); // aggiorna ogni 30s
+    return () => clearInterval(intervalId);
   }, []);
+
+
 
   const toggleCheckbox = (index, type) => {
     const updated =
