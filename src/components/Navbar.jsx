@@ -1,138 +1,102 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Navbar.css';
-
 
 export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const isLoggedIn = !!localStorage.getItem('userEmail');
-
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  console.log('menuOpen:', menuOpen);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 100);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 100);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const closeNavbar = () => {
-    const navbar = document.getElementById('navbarNav');
-    if (navbar && navbar.classList.contains('show')) {
-      const existingInstance = Collapse.getInstance(navbar);
-      if (existingInstance) {
-        existingInstance.hide();
-      } else {
-        const bsCollapse = new Collapse(navbar, { toggle: false });
-        bsCollapse.hide();
-      }
-    }
-  };
-
-  const handleScrollOrNavigate = (id) => {
-    setTimeout(() => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
-      closeNavbar();
-    }, 100);
-
+  const handleNavigate = (id) => {
+    setMenuOpen(false);
     if (location.pathname !== '/') {
       navigate(`/#${id}`);
+    } else {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      const navbar = document.getElementById('navbarNav');
-      const toggler = document.querySelector('.navbar-toggler');
-      if (navbar?.classList.contains('show') && !navbar.contains(event.target) && !toggler.contains(event.target)) {
-        closeNavbar();
+    const handleResize = () => {
+      if (window.innerWidth >= 992) {
+        setMenuOpen(false);
       }
     };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+  
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/login');
+    setMenuOpen(false);
+  };
+
   return (
-    <nav className={`navbar navbar-expand-lg fixed-top px-3 shadow-sm ${scrolled ? 'navbar-solid' : 'navbar-transparent'}`}>
-      <div className="container">
-        <Link className="navbar-brand fw-bold" to="/" onClick={closeNavbar}>
-          ParentUp
-        </Link>
+    <header className={`navbar-header ${scrolled ? 'solid' : ''}`}>
+      <div className="navbar-inner">
+        <Link to="/" className="navbar-logo" onClick={() => setMenuOpen(false)}>ParentUp</Link>
+
+        {/* Desktop menu */}
+        <nav className="desktop-menu">
+          <button className="menu-item" onClick={() => handleNavigate('neonato')}>Cura del bambino</button>
+          <button className="menu-item" onClick={() => handleNavigate('benessere')}>Benessere</button>
+          <button className="menu-item" onClick={() => handleNavigate('lgbtq')}>Genitorialità LGBTQ+</button>
+          <button className="menu-item" onClick={() => handleNavigate('lavoro')}>Ritorno al lavoro</button>
+          {isLoggedIn ? (
+            <>
+              <Link to="/dashboard" className="menu-item">Dashboard</Link>
+              <button className="menu-item logout" onClick={handleLogout}>Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="menu-item">Login</Link>
+              <Link to="/register" className="menu-item">Registrati</Link>
+            </>
+          )}
+        </nav>
+
+        {/* Hamburger per mobile */}
         <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
+          className="hamburger"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        > 
+          <div className="hamburger-lines" />
         </button>
-
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav me-auto">
-            <li className="nav-item">
-              <button className="btn nav-link" onClick={() => handleScrollOrNavigate('neonato')}>
-                Cura del bambino
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className="btn nav-link" onClick={() => handleScrollOrNavigate('benessere')}>
-                Benessere
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className="btn nav-link" onClick={() => handleScrollOrNavigate('lgbtq')}>
-                Genitorialità LGBTQ+
-              </button>
-            </li>
-            <li className="nav-item">
-              <button className="btn nav-link" onClick={() => handleScrollOrNavigate('lavoro')}>
-                Ritorno al lavoro
-              </button>
-            </li>
-          </ul>
-
-          <ul className="navbar-nav">
-            {isLoggedIn ? (
-              <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/dashboard" onClick={closeNavbar}>
-                    Dashboard
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-outline-danger ms-2" onClick={() => {
-                    localStorage.clear();
-                    navigate('/login');
-                    closeNavbar();
-                  }}>
-                    Logout
-                  </button>
-                </li>
-              </>
-            ) : (
-              <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/login" onClick={closeNavbar}>
-                    Login
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/register" onClick={closeNavbar}>
-                    Registrati
-                  </Link>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
       </div>
-    </nav>
+
+      {/* Dropdown solo mobile */}
+      {menuOpen && (
+        <div className="dropdown-menu">
+          <button className="menu-item" onClick={() => handleNavigate('neonato')}>Cura del bambino</button>
+          <button className="menu-item" onClick={() => handleNavigate('benessere')}>Benessere</button>
+          <button className="menu-item" onClick={() => handleNavigate('lgbtq')}>Genitorialità LGBTQ+</button>
+          <button className="menu-item" onClick={() => handleNavigate('lavoro')}>Ritorno al lavoro</button>
+          {isLoggedIn ? (
+            <>
+              <Link to="/dashboard" className="menu-item" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+              <button className="menu-item logout" onClick={handleLogout}>Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="menu-item" onClick={() => setMenuOpen(false)}>Login</Link>
+              <Link to="/register" className="menu-item" onClick={() => setMenuOpen(false)}>Registrati</Link>
+            </>
+          )}
+        </div>
+      )}
+    </header>
   );
 }

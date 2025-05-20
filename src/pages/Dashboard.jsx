@@ -128,7 +128,7 @@ export default function Dashboard() {
 
   return (
     <div className="container mt-5">
-      <h1 class="title-welcome">
+      <h1 className="title-welcome">
         Benvenutə {nome} {cognome}
       </h1>
       <p>Questa è la tua dashboard personale.</p>
