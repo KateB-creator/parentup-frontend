@@ -124,7 +124,7 @@ export default function LoginForm() {
               <>
                 <div className="mb-3">
                   <label>Nuova password</label>
-                  <input type="password" className="form-control rounded-pill" value={newPassword}
+                  <input type="password" className="form-control rounded-pill" value={newPassword} 
                     onChange={(e) => setNewPassword(e.target.value)} />
                 </div>
                 <button type="button" className="btn btn-success w-100 rounded-pill" onClick={handleResetPassword}>

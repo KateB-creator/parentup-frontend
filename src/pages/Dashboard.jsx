@@ -1,35 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { logout, updateUser, deleteUser, getNotifications,clearNotifications,} from "../api/auth";
+import {
+  logout,
+  updateUser,
+  deleteUser,
+  getNotifications,
+  clearNotifications,
+} from "../api/auth";
 import "../styles/Dashboard.css";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState(localStorage.getItem("userEmail") || "");
-  const [userId] = useState(localStorage.getItem("userId"));
-  const [nome] = useState(localStorage.getItem("userNome") || "");
-  const [cognome] = useState(localStorage.getItem("userCognome") || "");
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [messaggio, setMessaggio] = useState("");
   const [modificaAttiva, setModificaAttiva] = useState(false);
-  const [modificaPassword, setModificaPassword] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
   const [notifiche, setNotifiche] = useState([]);
 
-  const [curaBambino, setCuraBambino] = useState(() => {
-    return (
-      JSON.parse(localStorage.getItem("curaBambino")) || Array(5).fill(false)
-    );
-  });
+  const [curaBambino, setCuraBambino] = useState(() =>
+    JSON.parse(localStorage.getItem("curaBambino")) || Array(5).fill(false)
+  );
 
-  const [ritornoLavoro, setRitornoLavoro] = useState(() => {
-    return (
-      JSON.parse(localStorage.getItem("ritornoLavoro")) || Array(5).fill(false)
-    );
-  });
+  const [ritornoLavoro, setRitornoLavoro] = useState(() =>
+    JSON.parse(localStorage.getItem("ritornoLavoro")) || Array(5).fill(false)
+  );
 
   useEffect(() => {
-    if (!email) navigate("/login");
-  }, [email, navigate]);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser);
+        setUser(parsed);
+        setEmail(parsed.email);
+      } catch (error) {
+        console.error("Errore parsing utente:", error);
+        navigate("/login");
+      }
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   useEffect(() => {
     localStorage.setItem("curaBambino", JSON.stringify(curaBambino));
@@ -39,7 +50,7 @@ export default function Dashboard() {
     localStorage.setItem("ritornoLavoro", JSON.stringify(ritornoLavoro));
   }, [ritornoLavoro]);
 
-  const caricaNotifiche = () => {
+  useEffect(() => {
     getNotifications()
       .then((res) => {
         if (res.data && Array.isArray(res.data)) {
@@ -47,34 +58,21 @@ export default function Dashboard() {
         }
       })
       .catch((err) => console.error("Errore notifiche:", err));
-  };
-
-  useEffect(() => {
-    caricaNotifiche();
   }, []);
 
   const toggleCheckbox = (index, type) => {
-    if (type === "cura") {
-      const updated = [...curaBambino];
-      updated[index] = !updated[index];
-      setCuraBambino(updated);
-    } else if (type === "lavoro") {
-      const updated = [...ritornoLavoro];
-      updated[index] = !updated[index];
-      setRitornoLavoro(updated);
-    }
+    const updated =
+      type === "cura" ? [...curaBambino] : [...ritornoLavoro];
+    updated[index] = !updated[index];
+    type === "cura" ? setCuraBambino(updated) : setRitornoLavoro(updated);
   };
 
   const handleClearNotifications = () => {
     clearNotifications()
       .then((res) => {
-        if (res.data.success) {
-          setNotifiche([]);
-        }
+        if (res.data.success) setNotifiche([]);
       })
-      .catch((err) =>
-        console.error("Errore durante la cancellazione notifiche:", err)
-      );
+      .catch((err) => console.error("Errore cancellazione notifiche:", err));
   };
 
   const handleLogout = async () => {
@@ -85,52 +83,48 @@ export default function Dashboard() {
 
   const handleModifica = async () => {
     try {
-      const id = localStorage.getItem("userId"); 
-
       const payload = { email };
-      if (newPassword.trim()) {
-        payload.password = newPassword;
-      }
+      if (newPassword.trim()) payload.password = newPassword;
 
-      const res = await updateUser(userId, payload); 
+      const res = await updateUser(user.id, payload);
       if (res.data.success) {
-        localStorage.setItem("userEmail", email);
+        const updatedUser = { ...user, email };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setUser(updatedUser);
         setMessaggio("Dati aggiornati con successo.");
         setModificaAttiva(false);
         setNewPassword("");
       } else {
         setMessaggio(res.data.message || "Errore durante l’aggiornamento.");
       }
-    } catch (err) {
+    } catch {
       setMessaggio("Errore di connessione.");
     }
   };
 
   const handleCancella = async () => {
     if (
-      window.confirm(
-        "Sei sicuro di voler cancellare il tuo account? L'operazione è irreversibile."
-      )
+      window.confirm("Vuoi cancellare il tuo account? L’operazione è irreversibile.")
     ) {
       try {
-        const res = await deleteUser(userId);
+        const res = await deleteUser(user.id);
         if (res.data.success) {
           localStorage.clear();
           navigate("/register");
         } else {
           setMessaggio(res.data.message || "Errore durante la cancellazione.");
         }
-      } catch (err) {
+      } catch {
         setMessaggio("Errore di connessione.");
       }
     }
   };
 
+  if (!user) return null;
+
   return (
     <div className="container mt-5">
-      <h1 className="title-welcome">
-        Benvenutə {nome} {cognome}
-      </h1>
+      <h1 className="title-welcome">Benvenutə {user.nome} {user.cognome}</h1>
       <p>Questa è la tua dashboard personale.</p>
 
       <hr />
@@ -150,8 +144,7 @@ export default function Dashboard() {
           <ul className="mb-0 mt-2">
             {notifiche.map((n, i) => (
               <li key={i}>
-                {n.message}{" "}
-                <small className="text-muted">({n.created_at})</small>
+                {n.message} <small className="text-muted">({n.created_at})</small>
               </li>
             ))}
           </ul>
@@ -160,7 +153,6 @@ export default function Dashboard() {
         <p className="text-muted">Nessuna notifica al momento.</p>
       )}
 
-      {/* Checklist Cura del Bambino */}
       <div className="row mt-4">
         <div className="col-md-6">
           <h5>Checklist per la cura del bambino</h5>
@@ -188,7 +180,7 @@ export default function Dashboard() {
           <h5>Checklist per il ritorno al lavoro</h5>
           <ul className="list-unstyled">
             {[
-              "Organizzazione allattamento (tiralatte o svezzamento)",
+              "Organizzazione allattamento",
               "Baby-sitter o nido confermati",
               "Pianificazione orari e permessi",
               "Preparazione kit lavoro/mamma",
@@ -208,8 +200,8 @@ export default function Dashboard() {
       </div>
 
       <hr />
-
       <h5>Gestione account</h5>
+
       <div className="mb-3">
         <label>Email</label>
         <input
@@ -244,7 +236,6 @@ export default function Dashboard() {
               className="btn btn-secondary"
               onClick={() => {
                 setModificaAttiva(false);
-                setModificaPassword(false);
                 setNewPassword("");
               }}
             >
@@ -267,7 +258,6 @@ export default function Dashboard() {
       {messaggio && <div className="alert alert-info mt-3">{messaggio}</div>}
 
       <hr />
-
       <button onClick={handleLogout} className="btn btn-outline-danger mt-3">
         Logout
       </button>
